@@ -1,0 +1,7 @@
+# Strips notebook outputs on commit so base64 plots never bloat the repo.
+# Enable once with:  pre-commit install
+repos:
+  - repo: https://github.com/kynan/nbstripout
+    rev: 0.9.1
+    hooks:
+      - id: nbstripout

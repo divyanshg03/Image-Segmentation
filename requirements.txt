@@ -1,0 +1,9 @@
+# Runtime dependencies. Tested with Python 3.13, torch 2.8, numpy 2.2,
+# opencv 4.12, pillow 11.3, matplotlib 3.10, segment-anything 1.0.
+numpy>=1.26
+pillow>=10.0
+opencv-python>=4.9
+matplotlib>=3.8
+torch>=2.4
+torchvision>=0.19
+segment-anything==1.0

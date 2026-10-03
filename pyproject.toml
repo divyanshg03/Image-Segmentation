@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "imgseg"
+version = "0.1.0"
+description = "Promptable image segmentation (point, box, segment-everything) on top of Meta's Segment Anything Model."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+dynamic = ["dependencies"]
+
+[project.optional-dependencies]
+demo = ["fastapi>=0.110", "uvicorn>=0.29", "python-multipart>=0.0.9"]
+
+[project.scripts]
+imgseg = "imgseg.cli:main"
+
+[tool.setuptools]
+packages = ["imgseg", "imgseg.demo"]
+
+[tool.setuptools.package-data]
+"imgseg.demo" = ["static/*"]
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+markers = ["slow: needs SAM weights in weights/ (skipped when they are missing)"]
