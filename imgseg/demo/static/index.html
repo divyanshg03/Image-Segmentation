@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>imgseg - interactive segmentation</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%231d5fd6%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%278%27 fill=%27%232fd36b%27 fill-opacity=%27.9%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%273%27 fill=%27white%27/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true"></span>
+      <h1>imgseg</h1>
+      <span class="sub">Segment Anything, interactively</span>
+    </div>
+    <div class="chips">
+      <span id="device-chip" class="chip" title="Where the model runs">connecting...</span>
+      <span id="image-chip" class="chip hidden" title="Current image"></span>
+    </div>
+    <div class="actions">
+      <button id="open-btn" class="btn primary" type="button">Open image</button>
+      <input id="file-input" type="file" accept="image/*" hidden>
+    </div>
+  </header>
+
+  <main class="layout">
+    <nav class="tools" aria-label="Tools">
+      <div class="group" role="radiogroup" aria-label="What a click does">
+        <button class="tool" type="button" role="radio" aria-checked="true" data-mode="include">
+          <span class="swatch include" aria-hidden="true"></span><span class="label">Include</span><kbd>I</kbd>
+        </button>
+        <button class="tool" type="button" role="radio" aria-checked="false" data-mode="exclude">
+          <span class="swatch exclude" aria-hidden="true"></span><span class="label">Exclude</span><kbd>E</kbd>
+        </button>
+        <button class="tool" type="button" role="radio" aria-checked="false" data-mode="box">
+          <span class="swatch box" aria-hidden="true"></span><span class="label">Box</span><kbd>B</kbd>
+        </button>
+      </div>
+
+      <div class="group">
+        <button id="undo-btn" class="btn" type="button">Undo <kbd>Ctrl+Z</kbd></button>
+        <button id="reset-btn" class="btn" type="button">Reset <kbd>R</kbd></button>
+      </div>
+
+      <div class="group">
+        <label class="switch"><input id="hover-toggle" type="checkbox"><span>Hover preview</span><kbd>H</kbd></label>
+        <button id="everything-btn" class="btn" type="button">Segment everything</button>
+      </div>
+
+      <p id="hint" class="hint">Open an image or pick a sample to begin.</p>
+    </nav>
+
+    <section id="stage" class="stage">
+      <canvas id="canvas" tabindex="0"
+              aria-label="Image canvas. Click to include, right-click to exclude, drag to draw a box."></canvas>
+
+      <div class="zoom" aria-label="Zoom">
+        <button id="zoom-in" class="icon-btn" type="button" aria-label="Zoom in">+</button>
+        <button id="zoom-out" class="icon-btn" type="button" aria-label="Zoom out">-</button>
+        <button id="zoom-fit" class="icon-btn" type="button" aria-label="Fit image to view">Fit</button>
+      </div>
+
+      <div id="dropzone" class="dropzone">
+        <div class="drop-card">
+          <h2>Drop an image here</h2>
+          <p>or paste one (Ctrl+V), or <button id="drop-open" class="link" type="button">browse</button>.</p>
+          <div id="samples" class="samples" aria-label="Sample images"></div>
+        </div>
+      </div>
+
+      <div id="busy" class="busy hidden" role="status" aria-live="polite">
+        <div class="spinner" aria-hidden="true"></div><span id="busy-text">Working...</span>
+      </div>
+    </section>
+
+    <aside class="panel" aria-label="Result">
+      <h2>Result</h2>
+      <dl class="stats">
+        <div><dt>Score</dt><dd id="stat-score">-</dd></div>
+        <div><dt>Area</dt><dd id="stat-area">-</dd></div>
+        <div><dt>Decode</dt><dd id="stat-decode">-</dd></div>
+        <div><dt>Encode</dt><dd id="stat-encode">-</dd></div>
+      </dl>
+
+      <div id="candidates-wrap" class="hidden">
+        <h3>Candidates <small>keys 1 / 2 / 3</small></h3>
+        <div id="candidates" class="candidates"></div>
+      </div>
+
+      <h3>Pick for a single click</h3>
+      <div id="select-group" class="segmented" role="radiogroup" aria-label="Which mask a lone click returns">
+        <button type="button" role="radio" aria-checked="true" data-select="score" title="SAM's top-scoring candidate">SAM's pick</button>
+        <button type="button" role="radio" aria-checked="false" data-select="largest" title="The widest candidate">Largest</button>
+      </div>
+      <p class="note">A lone click is ambiguous (shirt, person, group). More clicks or a box remove the guesswork.</p>
+
+      <h3>Export</h3>
+      <div class="exports">
+        <a class="btn" data-kind="cutout-crop" aria-disabled="true">Cut-out, cropped</a>
+        <a class="btn" data-kind="cutout" aria-disabled="true">Cut-out, full size</a>
+        <a class="btn" data-kind="mask" aria-disabled="true">Mask</a>
+        <a class="btn" data-kind="overlay" aria-disabled="true">Overlay</a>
+      </div>
+
+      <div id="live" class="sr-only" aria-live="polite"></div>
+    </aside>
+  </main>
+
+  <div id="toast" class="toast hidden" role="alert"></div>
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
